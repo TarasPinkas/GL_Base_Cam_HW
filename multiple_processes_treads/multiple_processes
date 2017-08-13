@@ -1,0 +1,51 @@
+#include <unistd.h>				/* include execAB functins  */
+#include <sys/wait.h>			/* include wait				*/
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <errno.h>				/* include orrno			*/
+
+
+static inline void parent(const char *str)
+{
+	printf("Parent say: %s\n", str);
+}
+
+static inline void child(const char *str)
+{
+	char *arg[] = { "echo", "Child say:", (char *)str, NULL};
+
+	execv("/bin/echo", arg);	/* call echo function */
+}
+
+int main(int argc, char *argv[])
+{
+	/* Chack parameter quatity */
+	if (argc != 3)
+	{
+		printf("Error. Too few arguments:\t"
+				"(need two arguments)\n");
+		exit(1);
+	}
+
+	errno = 0;		/* set errno */
+
+	switch( fork())
+	{
+		case -1:	/* if fork error */
+			printf("Error. %s\n", strerror(errno));
+			exit(1);
+			break;
+
+		case 0:		/* Child process */
+			child(argv[2]);
+			break;
+
+		default:	/* parent process */
+			parent(argv[1]);
+			wait(NULL);		/* wait end of child process */
+			break;
+	}
+
+	return 0;
+}
