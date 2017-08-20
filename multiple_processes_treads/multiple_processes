@@ -6,6 +6,10 @@
 #include <errno.h>				/* include orrno			*/
 
 
+const char *CHILD_PROG = "echo";
+const char *CHILD_PATH = "/bin/echo";
+
+
 static inline void parent(const char *str)
 {
 	printf("Parent say: %s\n", str);
@@ -13,9 +17,9 @@ static inline void parent(const char *str)
 
 static inline void child(const char *str)
 {
-	char *arg[] = { "echo", "Child say:", (char *)str, NULL};
+	char *arg[] = { (char*)CHILD_PROG, "Child say:", (char *)str, NULL};
 
-	execv("/bin/echo", arg);	/* call echo function */
+	execv((char *)CHILD_PATH, arg);	/* call echo function */
 }
 
 int main(int argc, char *argv[])
