@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <signal.h>
+#include <stdint.h>
 
 
 #define THREAD_QUANTITY 5
@@ -31,10 +32,9 @@ int get_id(void)
 
 static void *thread_func(void *arg)
 {
-	int thread_id = *(int*)arg;
 	while(thread_status)
 	{
-		printf("Thread %d id = %d\n", thread_id, get_id());
+		printf("Thread %d id = %d\n", (int)((intptr_t)arg), get_id());
 		sleep(1);
 	}
 	return 0;
@@ -52,7 +52,7 @@ int main(void)
 
 	for (i = 0; i < THREAD_QUANTITY; i++)
 	{
-		if((error = pthread_create(&tread[i], NULL, thread_func, (int*)&i)))
+		if((error = pthread_create(&tread[i], NULL, thread_func, (void*)((intptr_t)i))))
 		{
 			printf("Error, %s\n", strerror(error));
 		}
