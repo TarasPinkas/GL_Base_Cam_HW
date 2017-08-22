@@ -1,0 +1,19 @@
+#!/bin/bash 
+
+echo "Without error:"
+echo "sbin: " $(ls -d /sbin 2>/dev/null)
+echo "abra: " $(ls -d /abracadabra 2>/dev/null)
+
+echo "Error:"
+echo "sbin: " $(ls -d /sbin >/dev/null)
+echo "abra: " $(ls -d /abracadabra >/dev/null)
+
+echo "All in std:"
+echo "sbin: " $(ls -d /sbin  2>&1)
+echo "abra: " $(ls -d /abracadabra  2>&1)
+
+echo "All in error:"
+echo "sbin: " $(ls -d /sbin  >&2)
+echo "abra: " $(ls -d /abracadabra  >&2)
+
+

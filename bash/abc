@@ -1,0 +1,8 @@
+#!/bin/sh
+
+str="a b c"
+
+for i in $str
+do
+	echo $i
+done

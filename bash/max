@@ -1,0 +1,14 @@
+#!/bin/bash
+
+ans=$(($1 - $2))
+
+
+if [ $ans -gt 0 ]
+then
+	echo "$1 > $2"
+elif [ $ans -lt 0 ]
+then
+	echo "$1 < $2"
+else
+	echo "$1 = $2"
+fi

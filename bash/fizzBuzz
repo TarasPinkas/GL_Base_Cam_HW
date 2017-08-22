@@ -1,0 +1,22 @@
+#!/bin/bash
+index=0 
+for ((i = 0; i < 100; i++))
+do
+	index=$i
+	if [ $((i % 15)) -eq 0 ]
+	then
+		echo "$index: FizzBuzz"
+		
+		elif [ $((i % 5)) -eq 0 ]
+		then
+			echo "$index: Fizz"
+			
+			elif [ $((i % 3)) -eq 0 ]
+			then 
+				echo "$index: Buzz"
+
+				else
+					echo "$index: $i"
+
+	fi
+done
