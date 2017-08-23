@@ -6,7 +6,7 @@ for div in $*
 do
 	for i in $(seq 0 $end_rang)
 	do
-		if [ $(($i % $div)) -eq 0 ]
+		if [ $((i % div)) -eq 0 ]
 		then
 			echo "$i / $div"
 		fi

@@ -1,0 +1,22 @@
+#!/bin/bash
+
+echo "Type first number:"
+read first
+echo "Type second number:"
+read second
+
+echo "first = $first, thecond = $second"
+
+echo "Type \'1\' to print first elem or \'2\' to print second"
+read ans
+
+case "$ans" in
+	1)
+		echo $first
+		;;
+	2)
+		echo $second
+		;;
+	*)
+		;;
+esac

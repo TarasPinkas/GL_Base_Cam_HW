@@ -1,12 +1,16 @@
-#!/bin/bash
+#!/bin/bash -xue
+
+if [ "$#" != 2 ]; then
+	set 0 0
+fi
 
 ans=$(($1 - $2))
 
 
-if [ $ans -gt 0 ]
+if [ "$ans" -gt 0 ]
 then
 	echo "$1 > $2"
-elif [ $ans -lt 0 ]
+elif [ "$ans" -lt 0 ]
 then
 	echo "$1 < $2"
 else

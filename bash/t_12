@@ -1,0 +1,6 @@
+#!/bin/bash
+sleep 15&
+jobs
+sleep 20&
+jobs
+wait

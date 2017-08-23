@@ -1,0 +1,29 @@
+#!/bin/bash
+echo "Enter prefix:"
+read pref
+
+echo "Enter first sufix:"
+read suf1
+
+echo "Enter second sufix:"
+read suf2
+
+echo "Enter value of variable $pref$suf1:"
+read v1
+
+echo "Enter value of variable $pref$suf2:"
+read v2
+
+echo "Enter variable to output:"
+read ans
+
+echo "Result:"
+if [ $ans -eq $suf1 ]
+then 
+	echo $v1
+elif [ $ans -eq $suf2 ]
+then
+	echo $v2
+else
+	echo "wrong choose"
+fi
