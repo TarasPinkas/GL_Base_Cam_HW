@@ -1,12 +1,10 @@
-CC			:= gcc
+CC		:= gcc
 CFLAGS		+= -Wall -pedantic -Werror
 LDFLAGS 	= -lpthread
 
-OBJECTS		:= main.o server.o
+OBJECTS		:= main.o server.o client.o
 
+main: $(OBJECTS)
 
-all: $(OBJECTS)
-	$(CC) $(CFLAGS) -o main $(OBJECTS)
-	
-
-
+clean:
+	@rm -f $(OBJECTS) main

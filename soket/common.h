@@ -14,7 +14,9 @@ enum {
 	ERROR_INTERRUPTED = 100
 };
 
-#define MAX_MESSAGE_SIZE 2000
-#define MAX_CLIENTS		 10
+#define MAX_MESSAGE_SIZE 	2000
+#define MAX_CLIENTS		10
+#define MAX_CLIENT_MES		10
+#define FINAL_MES 		"End connection\n"
 
 #endif

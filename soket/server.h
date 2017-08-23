@@ -1,18 +1,16 @@
 #ifndef SERVER_H
 #define SERVER_H
-
-static inline void print_error(int error_code);
+#include <sys/socket.h>
 
 /*
- * socket_fd	- server`s socket file descriptor
+ * socket_fd		- server`s socket file descriptor
  * *sa			- pointer to struct sockaddr
  * domain		- AF_UNIX, AF_INET, ...
  * type			- SOCK_STREAM, SOCK_DGRAM, ...
- * max_client	- defined on common.h
+ * max_client		- defined on common.h
+ * *status 		- if 0 stop loop
 */
-int init_server_socket(int *socket_fd, struct sockaddr_in *sa, int domain, int type, int protocol);
 
-
-void server_loop(int server_socket_fd, int *status);
+void server_loop(int *status, struct sockaddr *sa, int domain, int type, int protocol);
 
 #endif /* SERVER_H */
