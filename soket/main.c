@@ -8,10 +8,13 @@
 
 #include "server.h"
 #include "client.h"
+#include "common.h"
 
+const int MAX_CLIENTS		= 7;
+const int MAX_CLIENT_MES	= 3;
+const int MAX_MESSAGE_SIZE 	= 2000;
 
-int status = 1;		/* stooped application  */
-
+int status = 1;	
 
 void sig_handler(int sig)
 {

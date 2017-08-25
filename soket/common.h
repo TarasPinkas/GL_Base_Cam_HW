@@ -1,6 +1,8 @@
 #ifndef COMMON_H
 #define COMMON_H
 
+#include <arpa/inet.h>
+
 enum {
 	NO_ERROR = 0,
 	ERROR_CANT_CREATE = 1,
@@ -14,9 +16,16 @@ enum {
 	ERROR_INTERRUPTED = 100
 };
 
-#define MAX_MESSAGE_SIZE 	2000
-#define MAX_CLIENTS		10
-#define MAX_CLIENT_MES		10
 #define FINAL_MES 		"End connection\n"
 
-#endif
+#define DOMAIN		AF_INET
+#define SERVER_ADDR	(inet_addr("127.0.0.1"))
+#define SERVER_PORT	(htons(8888))
+#define TYPE		SOCK_STREAM
+#define PROTOCOL	0
+
+const int MAX_CLIENTS;
+const int MAX_CLIENT_MES;
+const int MAX_MESSAGE_SIZE;
+
+#endif /* COMMON_H */

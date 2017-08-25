@@ -1,8 +1,8 @@
 CC		:= gcc
-CFLAGS		+= -Wall -pedantic -Werror
+CFLAGS		+= -pthread -Wall -pedantic 
 LDFLAGS 	= -lpthread
 
-OBJECTS		:= main.o server.o client.o
+OBJECTS		:= main.o server.o client.o 
 
 main: $(OBJECTS)
 
