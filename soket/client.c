@@ -11,18 +11,6 @@
 #include "common.h"
 #include "client.h"
 
-
-#define DEBUG
-
-
-static inline void debug(char *str)
-{
-	#ifdef DEBUG
-		printf("Debug: %s\r\n", str);
-	#endif
-}
-
-
 static void* thread_func(void *);
 
 
@@ -46,7 +34,6 @@ void client_loop(int *status)
 	pthread_t threads[MAX_CLIENTS];
 
 	status_property(*status);
-	
 
 	while (status_property(0) && (client_count < MAX_CLIENTS))
 	{
@@ -54,7 +41,6 @@ void client_loop(int *status)
 		client_count++;
 		sleep(1);
 	}
-	
 
 	for (i = 0; i < MAX_CLIENTS; i++)
 	{
@@ -71,43 +57,43 @@ static void* thread_func(void *arg)
 	int mes_counter = 0;
 
 	char messag[MAX_MESSAGE_SIZE];
-	
+
 	memset(messag, '\0', sizeof(messag));
 
 	struct sockaddr_in server =
-	{ 
-		.sin_family 		= DOMAIN,
-		.sin_addr.s_addr 	= SERVER_ADDR,
-		.sin_port 		= SERVER_PORT
+	{
+		.sin_family			= DOMAIN,
+		.sin_addr.s_addr	= SERVER_ADDR,
+		.sin_port			= SERVER_PORT
 	};
-	
+
 	sock_fd = socket(DOMAIN, TYPE, PROTOCOL);
-	
+
 	if(sock_fd == -1)
 	{
 		fprintf(stderr, "Could not create client(%d) socket\r\n", thread_id);
 		close(sock_fd);
 		return (int *)ERROR_CANT_CREATE;
-	}	
-	
+	}
+
 	if (connect(sock_fd, (struct sockaddr *)&server, sizeof(server)) < 0)
 	{
 		fprintf(stderr, "Client(%d) can`t connect\r\n", thread_id);
 		close(sock_fd);
 		return (int *)ERROR_CANT_CONNECT;
 	}
-	
+
 	printf("Thread %d:\r\n", thread_id);
-	
+
 	while(mes_counter < MAX_CLIENT_MES && status_property(0))
 	 {
 		sprintf(messag, "%s %d\r\n", "Thread: ", thread_id);
-		
+
 		if(send(sock_fd, messag, strlen(messag), 0) < 0)
-	 	{
+		{
 			fprintf(stderr, "Client(%d) can`t send the message\r\n", thread_id);
 			continue;
-		}	
+		}
 
 		errno = 0;
 		if (recv(sock_fd, messag, MAX_MESSAGE_SIZE, 0) < 0)
@@ -119,10 +105,10 @@ static void* thread_func(void *arg)
 		printf("Client(%d) got: \n\t%.*s\r\n", thread_id, (int)strlen(messag), messag);
 		mes_counter++;
 	 }
-	
-	 send(sock_fd, FINAL_MES, strlen(FINAL_MES), 0);
+
+	send(sock_fd, FINAL_MES, strlen(FINAL_MES), 0);
 
 	 close(sock_fd);
-	 
+
 	 pthread_exit(NULL);
 }

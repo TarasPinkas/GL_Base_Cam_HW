@@ -16,14 +16,6 @@
 
 static void *thread_func(void *arg);
 
-static inline void debug(char *str)
-{
-	#ifdef DEBUG
-		printf("DEBUG: %s\r\n", str);
-	#endif
-}
-
-
 
 static int status_property(int s)
 {
@@ -48,7 +40,7 @@ static int init_server_socket(int *socket_fd, struct sockaddr *sa, int domain, i
 {
 	int retval = 0;
 	*socket_fd = socket(domain, type, protocol);
-	
+
 	errno = 0;
 	if (*socket_fd < 0)
 	{
@@ -69,12 +61,12 @@ static int init_server_socket(int *socket_fd, struct sockaddr *sa, int domain, i
 		fprintf(stderr, "Server listen error: %s\r\n", strerror(errno));
 		retval = 1;
 	}
-	
+
 	if(retval)
 	{
 		close(*socket_fd);
 	}
-	return retval;	
+	return retval;
 }
 
 
@@ -102,26 +94,21 @@ void server_loop(int *status, struct sockaddr *sa, int domain, int type, int pro
 
 	pthread_t threads[MAX_CLIENTS];
 	int i = 0, s = 0;				/* tread counter */
-	
+
 	memset(client_fd, 0, sizeof(client_fd));
-	
+
 
 	status_property(*status);
 
 	if (init_server_socket(&server_fd, sa, domain, type, protocol))
 	{
-		debug("Init faild\n");
+		fprintf(stderr, "Init faild\n");
 		close(server_fd);
-		exit(1);	
-	}	
+		exit(1);
+	}
 
 	while(status_property(0) && i < MAX_CLIENTS)
 	{
-		while(client_fd[i] != 0)
-		{
-			i = (i + 1) % MAX_CLIENTS;
-		}
-
 		client_fd[i] = accept(server_fd, (struct sockaddr *)&client, &client_socklen);
 
 		if (client_fd[i] < 0)
@@ -130,7 +117,7 @@ void server_loop(int *status, struct sockaddr *sa, int domain, int type, int pro
 			client_fd[i] = 0;
 			continue;
 		}
-		
+
 		s = 0;
 		while(pthread_create(&threads[i], NULL, thread_func, (void*)((intptr_t)client_fd[i])) < 0)
 		{
@@ -141,9 +128,8 @@ void server_loop(int *status, struct sockaddr *sa, int domain, int type, int pro
 			s++;
 			sleep(1);
 		}
-		
+
 		i++;
-	
 	}
 
 	for (i = 0; i < MAX_CLIENTS; i++)
@@ -164,13 +150,13 @@ static void *thread_func(void *arg)
 	int read_size = 1;
 
 	memset(client_message, '\0', sizeof(client_message));
-	
+
 	while(read_size && status_property(0))
 	{
 		errno = 0;
 		read_size = recv(client_fd, client_message,
 				sizeof(client_message), 0);
-		
+
 		switch(read_size)
 		{
 			case 0:
