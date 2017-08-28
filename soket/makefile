@@ -1,5 +1,5 @@
 CC		:= gcc
-CFLAGS		+= -D=_GNU_SOURCE -pthread -Wall -Werror #-pedantic 
+CFLAGS		+= -D=_GNU_SOURCE -D=TCP -pthread -Wall -Werror #-pedantic 
 LDFLAGS 	= -lpthread
 
 

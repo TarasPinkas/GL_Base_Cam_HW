@@ -17,35 +17,30 @@ static void *thread_func(void *arg);
 static int init_server_socket(int *socket_fd, struct sockaddr *sa, 
 		int domain, int type, int protocol)
 {
-	int retval = 0;
+	errno = 0;
 	*socket_fd = socket(domain, type, protocol);
 	
-	errno = 0;
 	if (*socket_fd < 0)
 	{
 		fprintf(stderr, "Server create error: %s\r\n", strerror(errno));
-		retval = 1;
+		return  ERROR_CANT_CREATE;
 	}
 
 	errno = 0;
 	if (bind(*socket_fd, (struct sockaddr *) sa, sizeof(*sa)) < 0)
 	{
 		fprintf(stderr, "Server bind error: %s\r\n", strerror(errno));
-		retval = 1;
+		return ERROR_CANT_BIND;
 	}
 
 	errno = 0;
 	if (listen(*socket_fd, MAX_CLIENTS) < 0)
 	{
 		fprintf(stderr, "Server listen error: %s\r\n", strerror(errno));
-		retval = 1;
+		return ERROR_CANT_LISTEN;
 	}
 	
-	if(retval)
-	{
-		close(*socket_fd);
-	}
-	return retval;	
+	return NO_ERROR;
 }
 
 
