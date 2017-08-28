@@ -1,8 +1,9 @@
 CC		:= gcc
-CFLAGS		+= -pthread -Wall -pedantic 
+CFLAGS		+= -D=_GNU_SOURCE -pthread -Wall -Werror #-pedantic 
 LDFLAGS 	= -lpthread
 
-OBJECTS		:= main.o server.o client.o 
+
+OBJECTS		:= main.o server.o client.o common.o
 
 main: $(OBJECTS)
 

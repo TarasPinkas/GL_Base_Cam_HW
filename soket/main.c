@@ -3,42 +3,27 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <sys/socket.h>
-
+#include <stdlib.h>
 
 
 #include "server.h"
 #include "client.h"
 #include "common.h"
 
-const int MAX_CLIENTS		= 7;
-const int MAX_CLIENT_MES	= 3;
-const int MAX_MESSAGE_SIZE 	= 2000;
-
-int status = 1;	
-
-void sig_handler(int sig)
-{
-	printf("\rGet SIGINT(%d). Application stoped...\n", sig);
-	status = 0;
-}
-
 
 int main(void)
 {
-	struct sockaddr_in server = 
-	{ 
-		.sin_family 		= DOMAIN,
-		.sin_addr.s_addr 	= INADDR_ANY,
-		.sin_port 		= SERVER_PORT
-	};
+	int retval = 0;
 
-
-	signal(SIGINT, sig_handler);
 
 	switch (fork())
 	{
 		case 0:		/* child procces. TCP server */
-			server_loop(&status, (struct sockaddr *)&server, DOMAIN, TYPE, PROTOCOL);
+			if ((retval = server_loop(DOMAIN, TYPE, PROTOCOL)))
+			{
+				fprintf(stderr, "Error. error code = %d\r\n", retval);
+				exit(retval);
+			}
 			break;
 
 		case -1:	/* Error */
@@ -46,10 +31,11 @@ int main(void)
 			break;
 
 		default:	/* parent procces. TCP client */
-			client_loop(&status);
+			client_loop();
+			printf("Client loop closed\r\n");
 			wait(NULL);
 			break;
 	}
 
-	return 0;
+	return retval;
 }

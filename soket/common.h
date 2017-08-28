@@ -24,8 +24,14 @@ enum {
 #define TYPE		SOCK_STREAM
 #define PROTOCOL	0
 
-const int MAX_CLIENTS;
-const int MAX_CLIENT_MES;
-const int MAX_MESSAGE_SIZE;
+
+#define MAX_CLIENTS 		17
+#define SERVER_BUF		5
+#define MAX_CLIENT_MES		5
+#define MAX_MESSAGE_SIZE 	2000
+
+
+int is_done(int *status);
+struct sockaddr_in *get_sockaddr_in(int domain, int type, int protocol);
 
 #endif /* COMMON_H */

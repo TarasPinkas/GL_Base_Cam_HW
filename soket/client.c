@@ -12,45 +12,21 @@
 #include "client.h"
 
 
-#define DEBUG
-
-
-static inline void debug(char *str)
-{
-	#ifdef DEBUG
-		printf("Debug: %s\r\n", str);
-	#endif
-}
-
-
 static void* thread_func(void *);
 
 
-static int status_property(int s)
-{
-	static int status;
 
-	if(s)
-	{
-		status = s;
-	}
-
-	return status;
-}
-
-
-void client_loop(int *status)
+void client_loop()
 {
 	int client_count = 0;
 	int i = 0;
 	pthread_t threads[MAX_CLIENTS];
 
-	status_property(*status);
 	
-
-	while (status_property(0) && (client_count < MAX_CLIENTS))
+	while ((client_count < MAX_CLIENTS))
 	{
-		pthread_create(&threads[client_count], NULL, thread_func, (void *)((intptr_t)client_count));
+		pthread_create(&threads[client_count], NULL, thread_func, 
+				(void *)((intptr_t)client_count));
 		client_count++;
 		sleep(1);
 	}
@@ -63,16 +39,23 @@ void client_loop(int *status)
 }
 
 
-
+/*
+ * return:
+ * 	NO_ERROR		if succses
+ *	ERROR_CANT_CREATE	if cant`n create socket
+ *	ERROR_CANT_CONNECT 	if cant`n connect to server			 
+ */
 static void* thread_func(void *arg)
 {
 	int thread_id = (int) ((intptr_t) arg);
 	int sock_fd = 0;
 	int mes_counter = 0;
 
-	char messag[MAX_MESSAGE_SIZE];
+	char messag[MAX_MESSAGE_SIZE] = {0};
 	
-	memset(messag, '\0', sizeof(messag));
+	int try_send_mes = 0;
+
+//	memset(messag, '\0', sizeof(messag));
 
 	struct sockaddr_in server =
 	{ 
@@ -87,32 +70,40 @@ static void* thread_func(void *arg)
 	{
 		fprintf(stderr, "Could not create client(%d) socket\r\n", thread_id);
 		close(sock_fd);
-		return (int *)ERROR_CANT_CREATE;
+		return (void *)((intptr_t)ERROR_CANT_CREATE);
 	}	
 	
 	if (connect(sock_fd, (struct sockaddr *)&server, sizeof(server)) < 0)
 	{
 		fprintf(stderr, "Client(%d) can`t connect\r\n", thread_id);
 		close(sock_fd);
-		return (int *)ERROR_CANT_CONNECT;
+		return (void *)((intptr_t)ERROR_CANT_CONNECT);
 	}
 	
-	printf("Thread %d:\r\n", thread_id);
+	printf("Client %d:\r\n", thread_id);
 	
-	while(mes_counter < MAX_CLIENT_MES && status_property(0))
-	 {
-		sprintf(messag, "%s %d\r\n", "Thread: ", thread_id);
-		
-		if(send(sock_fd, messag, strlen(messag), 0) < 0)
+
+
+	while(mes_counter < MAX_CLIENT_MES)
+	{
+		snprintf(messag, MAX_MESSAGE_SIZE, "%s %d\r\n", "Thread: ", thread_id);
+	
+		try_send_mes = 0;
+		while (send(sock_fd, messag, strlen(messag), 0) < 0)
 	 	{
 			fprintf(stderr, "Client(%d) can`t send the message\r\n", thread_id);
-			continue;
-		}	
+			
+			if (try_send_mes > 10)
+				continue;
 
+			sleep(10);
+			try_send_mes++;
+		}	
 		errno = 0;
 		if (recv(sock_fd, messag, MAX_MESSAGE_SIZE, 0) < 0)
 		{
-			fprintf(stderr, "Client(%d) recv failed\r\nErrno: %s\r\n", thread_id, strerror(errno));
+			fprintf(stderr, "Client(%d) recv failed\r\nErrno: %s\r\n", 
+					thread_id, strerror(errno));
 			continue;
 		}
 
@@ -124,5 +115,5 @@ static void* thread_func(void *arg)
 
 	 close(sock_fd);
 	 
-	 pthread_exit(NULL);
+	 return NO_ERROR;
 }

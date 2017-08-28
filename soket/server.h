@@ -3,14 +3,11 @@
 
 
 /*
- * socket_fd		- server`s socket file descriptor
- * *sa			- pointer to struct sockaddr
  * domain		- AF_UNIX, AF_INET, ...
  * type			- SOCK_STREAM, SOCK_DGRAM, ...
- * max_client		- defined on common.h
- * *status 		- if 0 stop loop
+ * protocol 		- 0
 */
 
-void server_loop(int *status, struct sockaddr *sa, int domain, int type, int protocol);
+int server_loop(int domain, int type, int protocol);
 
 #endif /* SERVER_H */
