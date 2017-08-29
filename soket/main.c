@@ -32,7 +32,7 @@ int main(void)
 
 		default:	/* parent procces. TCP client */
 			client_loop();
-			printf("Client loop closed\r\n");
+			print("Client loop closed\r\n");
 			wait(NULL);
 			break;
 	}

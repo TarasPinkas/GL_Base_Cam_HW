@@ -14,12 +14,12 @@
 
 static void *thread_func(void *arg);
 
-static int init_server_socket(int *socket_fd, struct sockaddr *sa, 
+static int init_server_socket(int *socket_fd, struct sockaddr *sa,
 		int domain, int type, int protocol)
 {
 	errno = 0;
 	*socket_fd = socket(domain, type, protocol);
-	
+
 	if (*socket_fd < 0)
 	{
 		fprintf(stderr, "Server create error: %s\r\n", strerror(errno));
@@ -39,7 +39,7 @@ static int init_server_socket(int *socket_fd, struct sockaddr *sa,
 		fprintf(stderr, "Server listen error: %s\r\n", strerror(errno));
 		return ERROR_CANT_LISTEN;
 	}
-	
+
 	return NO_ERROR;
 }
 
@@ -61,19 +61,19 @@ int server_loop(int domain, int type, int protocol)
 	int client_fd[SERVER_BUF] = {0};
 	struct sockaddr_in client;
 	socklen_t client_socklen = sizeof(struct sockaddr_in);
-	
+
 	/* Threads */
 	pthread_t threads[SERVER_BUF];
 	int thread_index = 0, try_counter = 0;
-	
+
 	/* Init server socket */
-	if ((retval = init_server_socket(&server_fd, (struct sockaddr *)&sa, 
+	if ((retval = init_server_socket(&server_fd, (struct sockaddr *)&sa,
 				domain, type, protocol)))
 	{
 		fprintf(stderr, "Init faild\n");
 		close(server_fd);
-		return retval;	
-	}	
+		return retval;
+	}
 
 	//while(thread_index < SERVER_BUF)
 	while(1)
@@ -84,16 +84,16 @@ int server_loop(int domain, int type, int protocol)
 			if (pthread_tryjoin_np(threads[thread_index], NULL))
 			{
 				thread_index = (thread_index + 1) % SERVER_BUF;
-			}	
+			}
 			else
 			{
-				client_fd[thread_index] 	= 0;
-				threads[thread_index] 		= 0;
+				client_fd[thread_index]	= 0;
+				threads[thread_index]	= 0;
 			}
 		}
 
 		client_fd[thread_index] = accept(server_fd,
-			       	(struct sockaddr *)&client, &client_socklen);
+				(struct sockaddr *)&client, &client_socklen);
 
 		if (client_fd[thread_index] < 0)
 		{
@@ -101,10 +101,10 @@ int server_loop(int domain, int type, int protocol)
 			client_fd[thread_index] = 0;
 			continue;
 		}
-		
+
 		/* creadte new thread from new client */
 		try_counter = 0;
-		while(pthread_create(&threads[thread_index], NULL, thread_func, 
+		while(pthread_create(&threads[thread_index], NULL, thread_func,
 				(void*)((intptr_t)client_fd[thread_index])) < 0)
 		{
 			if (try_counter == 5)
@@ -114,7 +114,7 @@ int server_loop(int domain, int type, int protocol)
 			try_counter++;
 			sleep(1);
 		}
-		
+
 		thread_index = (thread_index + 1) % SERVER_BUF;
 	}
 
@@ -125,7 +125,7 @@ int server_loop(int domain, int type, int protocol)
 
 	}
 
-	printf("\nServer closed\r\n\n");
+	print("\nServer closed\r\n\n");
 	close(server_fd);
 	return retval;
 }
@@ -136,17 +136,15 @@ int server_loop(int domain, int type, int protocol)
 static void *thread_func(void *arg)
 {
 	int client_fd = (int) ((intptr_t)arg);
-	char client_message[MAX_MESSAGE_SIZE];
+	char client_message[MAX_MESSAGE_SIZE] = {0};
 	int read_size = 1;
 
-	memset(client_message, '\0', sizeof(client_message));
-	
 	while(read_size)
 	{
 		errno = 0;
 		read_size = recv(client_fd, client_message,
 				sizeof(client_message), 0);
-		
+
 		switch(read_size)
 		{
 			case 0:
@@ -156,12 +154,12 @@ static void *thread_func(void *arg)
 
 			case -1:
 				fprintf(stderr, "Server receiv error: %s\r\n\n",
-					       	strerror(errno));
+				 	strerror(errno));
 				pthread_exit(NULL);
 				break;
 
 			default:
-				printf("Server got:\n\t%s", client_message);
+				print("Server got:\n\t%s", client_message);
 
 				if(!strcmp(client_message, FINAL_MES))
 				{
@@ -169,7 +167,7 @@ static void *thread_func(void *arg)
 					pthread_exit(NULL);
 				}
 
-				write(client_fd, client_message, 
+				write(client_fd, client_message,
 						strlen(client_message));
 				break;
 		}
