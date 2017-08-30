@@ -25,7 +25,7 @@ int print(const char str[], ...)
 	if (characters > 0)
 	{
 		pthread_mutex_lock(&mutex);
-		printf("%.*s", (int)strlen(buf), buf);
+			printf("%.*s", characters, buf);
 		pthread_mutex_unlock(&mutex);
 	}
 	return characters;

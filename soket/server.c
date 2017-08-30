@@ -15,11 +15,10 @@
 static void *thread_func(void *arg);
 
 static int init_server_socket(int *socket_fd, struct sockaddr *sa,
-		int domain, int type, int protocol)
+		const int domain, const int type, const int protocol)
 {
 	errno = 0;
 	*socket_fd = socket(domain, type, protocol);
-
 	if (*socket_fd < 0)
 	{
 		fprintf(stderr, "Server create error: %s\r\n", strerror(errno));
@@ -45,11 +44,11 @@ static int init_server_socket(int *socket_fd, struct sockaddr *sa,
 
 
 
-int server_loop(int domain, int type, int protocol)
+int server_loop(const int domain, const int type, const int protocol)
 {
 	int retval = 0;
 	/* Server */
-	int server_fd;
+	int server_fd = 0;
 	struct sockaddr_in sa =
 	{
 		.sin_family		= domain,
@@ -63,8 +62,10 @@ int server_loop(int domain, int type, int protocol)
 	socklen_t client_socklen = sizeof(struct sockaddr_in);
 
 	/* Threads */
-	pthread_t threads[SERVER_BUF];
+	pthread_t threads[SERVER_BUF] = {0};
 	int thread_index = 0, try_counter = 0;
+
+	memset(&client, 0, sizeof(client));
 
 	/* Init server socket */
 	if ((retval = init_server_socket(&server_fd, (struct sockaddr *)&sa,
@@ -75,7 +76,6 @@ int server_loop(int domain, int type, int protocol)
 		return retval;
 	}
 
-	//while(thread_index < SERVER_BUF)
 	while(1)
 	{
 		/* check free thread_index */
@@ -97,7 +97,6 @@ int server_loop(int domain, int type, int protocol)
 
 		if (client_fd[thread_index] < 0)
 		{
-			sleep(1);
 			client_fd[thread_index] = 0;
 			continue;
 		}
@@ -141,7 +140,6 @@ static void *thread_func(void *arg)
 
 	while(read_size)
 	{
-		errno = 0;
 		read_size = recv(client_fd, client_message,
 				sizeof(client_message), 0);
 
@@ -154,12 +152,12 @@ static void *thread_func(void *arg)
 
 			case -1:
 				fprintf(stderr, "Server receiv error: %s\r\n\n",
-				 	strerror(errno));
+					strerror(errno));
 				pthread_exit(NULL);
 				break;
 
 			default:
-				print("Server got:\n\t%s", client_message);
+				print("Server got:\n\t%.*s", read_size, client_message);
 
 				if(!strcmp(client_message, FINAL_MES))
 				{
@@ -167,8 +165,7 @@ static void *thread_func(void *arg)
 					pthread_exit(NULL);
 				}
 
-				write(client_fd, client_message,
-						strlen(client_message));
+				write(client_fd, client_message,read_size);
 				break;
 		}
 	}

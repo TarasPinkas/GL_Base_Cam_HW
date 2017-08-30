@@ -8,15 +8,15 @@
 
 #include "../common.h"
 
+#define MES_TO_SERV		"Hi server"
+
 int client_loop()
 {
 	char message[MAX_MESSAGE_SIZE] = {0};
 	int read_size = 0;
-	char str[] = "Hi server\r\n";
 	int mes_counter = 0;
-
-
 	int sock_fd = 0;
+
 	struct sockaddr_in server_sa =
 	{
 		.sin_family		= DOMAIN,
@@ -26,7 +26,6 @@ int client_loop()
 
 	socklen_t sockaddr_len = sizeof(struct sockaddr_in);
 
-	errno = 0;
 	sock_fd = socket(DOMAIN, TYPE, PROTOCOL);
 	if (sock_fd < 0)
 	{
@@ -38,15 +37,13 @@ int client_loop()
 	print("Client started\r\n");
 	while(mes_counter < MAX_CLIENT_MES)
 	{
-		errno = 0;
-		while( sendto(sock_fd, str, strlen(str), 0, (const struct sockaddr_in *)&server_sa,
+		while(sendto(sock_fd, MES_TO_SERV, strlen(MES_TO_SERV), 0, (const struct sockaddr_in *)&server_sa,
 				sizeof(server_sa)) < 0)
 		{
 			fprintf(stderr, "Client can`t send the message\r\n");
 			sleep (1);
 		}
 
-		errno = 0;
 		read_size = recvfrom(sock_fd, message, MAX_MESSAGE_SIZE, 0,
 					(struct sockaddr_in *)&server_sa, &sockaddr_len);
 

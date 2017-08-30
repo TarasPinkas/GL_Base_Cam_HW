@@ -10,7 +10,7 @@
 #include "client.h"
 #include "../common.h"
 
-void client_process();
+void client_process();		/* create a lot of clients */
 void *thread_func(void *);
 
 int main(void)
@@ -42,11 +42,10 @@ void client_process()
 {
 	int i = 0;
 
-	pthread_t thread[MAX_CLIENTS];
+	pthread_t thread[MAX_CLIENTS] = {0};
 
 	for (i = 0; i < MAX_CLIENTS; i++)
 	{
-		errno = 0;
 		if (pthread_create(&thread[i], NULL, thread_func, NULL))
 		{
 			perror("Thread create faild\r\n");

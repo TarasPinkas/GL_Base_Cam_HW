@@ -23,12 +23,11 @@ void client_loop()
 	pthread_t threads[MAX_CLIENTS];
 
 
-	while ((client_count < MAX_CLIENTS))
+	while (client_count < MAX_CLIENTS)
 	{
 		pthread_create(&threads[client_count], NULL, thread_func,
 				(void *)((intptr_t)client_count));
 		client_count++;
-		sleep(1);
 	}
 
 
@@ -53,10 +52,6 @@ static void* thread_func(void *arg)
 
 	char messag[MAX_MESSAGE_SIZE] = {0};
 
-	int try_send_mes = 0;
-
-//	memset(messag, '\0', sizeof(messag));
-
 	struct sockaddr_in server =
 	{
 		.sin_family			= DOMAIN,
@@ -80,27 +75,19 @@ static void* thread_func(void *arg)
 		return (void *)((intptr_t)ERROR_CANT_CONNECT);
 	}
 
-	printf("Client %d:\r\n", thread_id);
-
-
+	printf("Client %d started\r\n", thread_id);
 
 	while(mes_counter < MAX_CLIENT_MES)
 	{
-		snprintf(messag, MAX_MESSAGE_SIZE, "%s %d\r\n", "Thread: ", thread_id);
+		snprintf(messag, MAX_MESSAGE_SIZE - 1, "%s %d\r\n", "Thread: ", thread_id);
 
-		try_send_mes = 0;
-		while (send(sock_fd, messag, strlen(messag), 0) < 0)
+		if (send(sock_fd, messag, strlen(messag), 0) < 0)
 		{
 			fprintf(stderr, "Client(%d) can`t send the message\r\n", thread_id);
-
-			if (try_send_mes > 10)
-				continue;
-
-			sleep(10);
-			try_send_mes++;
+			continue;
 		}
-		errno = 0;
-		if (recv(sock_fd, messag, MAX_MESSAGE_SIZE, 0) < 0)
+
+		if (recv(sock_fd, messag, MAX_MESSAGE_SIZE - 1, 0) < 0)
 		{
 			fprintf(stderr, "Client(%d) recv failed\r\nErrno: %s\r\n",
 					thread_id, strerror(errno));
@@ -115,5 +102,5 @@ static void* thread_func(void *arg)
 
 	 close(sock_fd);
 
-	 return NO_ERROR;
+	 return (void *)((intptr_t) NO_ERROR);
 }

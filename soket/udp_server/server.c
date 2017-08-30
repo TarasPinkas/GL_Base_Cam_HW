@@ -8,7 +8,9 @@
 
 #include "../common.h"
 
-static int server_init(int *server_fd, int domain, int type, int protocol)
+#define MES_TO_CLIEN	"Hi client"
+
+static int server_init(int *server_fd, const int domain, const int type, const int protocol)
 {
 	struct sockaddr_in sa =
 	{
@@ -17,16 +19,12 @@ static int server_init(int *server_fd, int domain, int type, int protocol)
 		.sin_port			= SERVER_PORT
 	};
 
-	errno = 0;
 	*server_fd = socket(domain, type, protocol);
-
 	if(*server_fd < 0)
 	{
 		perror("Server create failed");
 		return  ERROR_CANT_CREATE;
 	}
-
-	errno = 0;
 
 	if(bind(*server_fd, (struct sockaddr *)&sa, sizeof(sa)) < 0)
 	{
@@ -38,7 +36,7 @@ static int server_init(int *server_fd, int domain, int type, int protocol)
 }
 
 
-int server_loop(int domain, int type, int protocol)
+int server_loop(const int domain, const int type, const int protocol)
 {
 	int server_fd = 0;
 
@@ -47,9 +45,7 @@ int server_loop(int domain, int type, int protocol)
 
 	int read_size = 0;
 	char message[MAX_MESSAGE_SIZE] = {0};
-	char str[] = "Hi client";
 
-	errno = 0;
 	if (server_init(&server_fd, domain, type, protocol))
 	{
 		perror("Server init failed");
@@ -61,7 +57,6 @@ int server_loop(int domain, int type, int protocol)
 
 	while(1)
 	{
-		errno = 0;
 		read_size = recvfrom(server_fd, message, sizeof(message), 0,
 						(struct sockaddr *)&client_sa, &client_socklen);
 		switch(read_size)
@@ -75,16 +70,16 @@ int server_loop(int domain, int type, int protocol)
 				break;
 
 			default:
-				print("Server got message: %.*s from %s, port %d\r\n",
+				print("Server got message: %.*s from %s, port %d\r\n\n",
 					read_size, message, inet_ntoa(client_sa.sin_addr),
 					ntohs(client_sa.sin_port));
 
-				snprintf(message, MAX_MESSAGE_SIZE, "%s %s:%d\r\n", str,
+				snprintf(message, MAX_MESSAGE_SIZE, "%s %s:%d", MES_TO_CLIEN,
 						inet_ntoa(client_sa.sin_addr), ntohs(client_sa.sin_port));
 
-				if ((read_size = sendto(server_fd, message, sizeof(message), 0,
+				if ( sendto(server_fd, message, sizeof(message), 0,
 							(struct sockaddr *)&client_sa,
-								sizeof(client_sa))) <= 0)
+								sizeof(client_sa)) < 0)
 				{
 					fprintf(stderr, "Server can`t send data to %s:%d\r\n",
 							inet_ntoa(client_sa.sin_addr),
