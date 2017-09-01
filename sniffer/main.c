@@ -7,7 +7,8 @@
 
 #include <linux/if_ether.h>
 #include <linux/ip.h>
-
+#include <linux/tcp.h>
+#include <linux/udp.h>
 
 #define TCP		6
 #define UDP		17
@@ -53,15 +54,15 @@ char *get_eth_type(int type)
 
 void print_tcp(const char *buf, const int size)
 {
-	struct tcphdr *tcp = (struct tcphdr *)(buf + sizeof (struct ethhdr) + sizeof(struct iphdr));
+	int len = sizeof (struct ethhdr) + sizeof(struct iphdr);
+	struct tcphdr *tcp = (struct tcphdr *)(buf + len);
 
 	printf("TCP header:\r\n");
-/*
+
 	printf("\t%s%u\r\n", "Source port: ", ntohs(tcp->source));
 	printf("\t%s%u\r\n", "Destination port: ", ntohs(tcp->dest));
-//	printf("\t%s%u\r\n", "Header length: ", (unsigned int)tcp->doff * 4);
+	printf("\t%s%u\r\n", "Header length: ", (unsigned int)tcp->doff * 4);
 	printf("\r\n");
-*/
 }
 
 void print_udp(const char *buf, const int size)
@@ -69,13 +70,11 @@ void print_udp(const char *buf, const int size)
 	struct udphdr *udp = (struct udphdr *)(buf + sizeof (struct ethhdr) + sizeof(struct iphdr));
 
 	printf("UDP header:\r\n");
-/*
+
 	printf("\t%s%u\r\n", "Source port: ", ntohs(udp->source));
 	printf("\t%s%u\r\n", "Destination port: ", ntohs(udp->dest));
 	printf("\t%s%u\r\n", "Header length: ", ntohs(udp->len));
 	printf("\r\n");
-
-	*/
 }
 
 
@@ -139,7 +138,7 @@ void print_data(const char *buf, const int read_size)
 
 }
 
-}
+
 /*	*/
 /* Print all info  */
 /*	*/
