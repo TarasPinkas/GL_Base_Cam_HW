@@ -41,26 +41,32 @@ static int init_server_socket(int *socket_fd, struct sockaddr *sa, int domain, i
 	int retval = 0;
 	*socket_fd = socket(domain, type, protocol);
 
-	errno = 0;
-	if (*socket_fd < 0)
-	{
-		fprintf(stderr, "Server create error: %s\r\n", strerror(errno));
-		retval = 1;
-	}
+	do {
 
-	errno = 0;
-	if (bind(*socket_fd, (struct sockaddr *) sa, sizeof(*sa)) < 0)
-	{
-		fprintf(stderr, "Server bind error: %s\r\n", strerror(errno));
-		retval = 1;
-	}
-
-	errno = 0;
-	if (listen(*socket_fd, MAX_CLIENTS) < 0)
-	{
-		fprintf(stderr, "Server listen error: %s\r\n", strerror(errno));
-		retval = 1;
-	}
+		errno = 0;
+		if (*socket_fd < 0)
+		{
+			fprintf(stderr, "Server create error: %s\r\n", strerror(errno));
+			retval = errno;
+			break;
+		}
+	
+		errno = 0;
+		if (bind(*socket_fd, (struct sockaddr *) sa, sizeof(*sa)) < 0)
+		{
+			fprintf(stderr, "Server bind error: %s\r\n", strerror(errno));
+			retval = errno;
+			break;
+		}
+	
+		errno = 0;
+		if (listen(*socket_fd, MAX_CLIENTS) < 0)
+		{
+			fprintf(stderr, "Server listen error: %s\r\n", strerror(errno));
+			retval = errno;
+			break;
+		}
+	} while(0);
 
 	if(retval)
 	{
